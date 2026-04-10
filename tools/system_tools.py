@@ -8,32 +8,56 @@ from config import settings
 
 
 def _get_all_disks() -> list:
-    """사용 가능한 모든 드라이브의 디스크 정보를 반환한다."""
+    """내장 디스크·외장HDD·USB·SD카드 등 연결된 모든 드라이브 정보를 반환한다.
+
+    psutil.disk_partitions() 를 사용해 실제 마운트된 파티션만 조회하므로
+    드라이브 문자 순회 방식보다 이동식 미디어 감지가 정확하다.
+    """
+    # opts 문자열에 포함된 키워드 → 한국어 종류 레이블
+    TYPE_LABEL = {
+        "removable": "이동식 (USB·외장HDD·SD카드)",
+        "fixed":     "내장 디스크",
+        "cdrom":     "CD/DVD",
+        "remote":    "네트워크 드라이브",
+        "ramdisk":   "RAM 디스크",
+    }
+
     disks = []
-    if platform.system() == "Windows":
-        for letter in string.ascii_uppercase:
-            path = f"{letter}:/"
-            try:
-                usage = psutil.disk_usage(path)
-                disks.append({
-                    "드라이브":   f"{letter}:",
-                    "전체(GB)":  round(usage.total / 1e9, 2),
-                    "사용중(GB)": round(usage.used / 1e9, 2),
-                    "여유(GB)":  round(usage.free / 1e9, 2),
-                    "사용률(%)": usage.percent,
-                })
-            except (PermissionError, OSError, FileNotFoundError):
-                pass
-    else:
-        usage = psutil.disk_usage("/")
-        disks.append({
-            "드라이브":   "/",
-            "전체(GB)":  round(usage.total / 1e9, 2),
-            "사용중(GB)": round(usage.used / 1e9, 2),
-            "여유(GB)":  round(usage.free / 1e9, 2),
-            "사용률(%)": usage.percent,
-        })
+    for part in psutil.disk_partitions(all=False):
+        try:
+            usage = psutil.disk_usage(part.mountpoint)
+            opts = part.opts.lower()
+            drive_type = next(
+                (label for key, label in TYPE_LABEL.items() if key in opts),
+                "알 수 없음",
+            )
+            disks.append({
+                "드라이브":   part.mountpoint.rstrip("\\/"),  # "C:" 형식으로 정리
+                "종류":       drive_type,
+                "파일시스템": part.fstype or "알 수 없음",
+                "전체(GB)":  round(usage.total / 1e9, 2),
+                "사용중(GB)": round(usage.used / 1e9, 2),
+                "여유(GB)":  round(usage.free / 1e9, 2),
+                "사용률(%)": usage.percent,
+            })
+        except (PermissionError, OSError, FileNotFoundError):
+            pass
     return disks
+
+
+def get_removable_drives() -> dict:
+    """현재 PC에 연결된 이동식 드라이브(USB·외장HDD·SD카드)만 반환한다."""
+    removable = [
+        d for d in _get_all_disks()
+        if "이동식" in d.get("종류", "")
+    ]
+    if not removable:
+        return {"결과": "없음", "메시지": "현재 연결된 이동식 드라이브가 없습니다."}
+    return {
+        "결과": "성공",
+        "연결된 이동식 드라이브 수": len(removable),
+        "목록": removable,
+    }
 
 
 def get_system_status() -> dict:

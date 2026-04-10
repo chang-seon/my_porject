@@ -11,7 +11,12 @@ from tools import system_tools, file_tools, web_tools, notify, file_organizer
 TOOLS = [
     {
         "name": "get_pc_overview",
-        "description": "PC 전체 개요를 조회한다. 사용자명, 홈·바탕화면·다운로드·문서·사진·음악·동영상 폴더 경로, 전체 드라이브 현황, 운영체제 정보를 반환한다.",
+        "description": "PC 전체 개요를 조회한다. 사용자명, 홈·바탕화면·다운로드·문서·사진·음악·동영상 폴더 경로, 전체 드라이브 현황(내장·이동식 구분 포함), 운영체제 정보를 반환한다.",
+        "input_schema": {"type": "object", "properties": {}, "required": []},
+    },
+    {
+        "name": "get_removable_drives",
+        "description": "현재 PC에 연결된 이동식 드라이브(USB·외장HDD·SD카드 등)만 조회한다. 연결 여부 확인 및 용량 점검에 사용한다.",
         "input_schema": {"type": "object", "properties": {}, "required": []},
     },
     {
@@ -124,8 +129,9 @@ TOOLS = [
 # ── 도구 실행 디스패처 ──────────────────────────────────────────────────────────
 
 TOOL_HANDLERS = {
-    "get_pc_overview":   lambda args: system_tools.get_pc_overview(),
-    "get_system_status": lambda args: system_tools.get_system_status(),
+    "get_pc_overview":      lambda args: system_tools.get_pc_overview(),
+    "get_removable_drives": lambda args: system_tools.get_removable_drives(),
+    "get_system_status":    lambda args: system_tools.get_system_status(),
     "list_top_processes": lambda args: system_tools.list_top_processes(args.get("n", 10)),
     "list_directory": lambda args: file_tools.list_directory(args["path"], args.get("pattern", "*")),
     "find_large_files": lambda args: file_tools.find_large_files(args["path"], args.get("min_size_mb", 100)),
