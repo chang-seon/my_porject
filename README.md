@@ -109,6 +109,17 @@ python main.py --mode scheduler
 
 ---
 
+## 의존성 관리 원칙
+
+- `requirements.txt`는 삭제 없이 누적 기록한다 — PC 교체 시 동일 환경 복원 목적
+- 버전 업그레이드 시 구버전을 주석으로 보존해 즉시 롤백 가능하도록 유지한다
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
 ## 라이선스
 
 개인 프로젝트 — 별도 라이선스 미지정
