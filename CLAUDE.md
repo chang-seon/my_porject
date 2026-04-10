@@ -264,11 +264,22 @@ https://github.com/chang-seon/my_porject.git
 ```
 1. git status 로 변경 파일 확인
 2. .env 파일은 절대 staging 하지 않는다
-3. 변경된 파일을 파일명 지정 방식으로 git add
-4. 커밋 메시지 작성 (한국어, 변경 내용 요약)
-5. git push https://github.com/chang-seon/my_porject.git main
-6. Push 완료 여부를 사용자에게 보고한다
+3. README.md 를 현재 구현 상태에 맞게 최신화한다
+4. 변경된 파일을 파일명 지정 방식으로 git add (README.md 포함)
+5. 커밋 메시지 작성 (한국어, 변경 내용 요약)
+6. git push https://github.com/chang-seon/my_porject.git main
+7. Push 완료 여부를 사용자에게 보고한다
 ```
+
+### README.md 작성 규칙
+
+Push 할 때마다 `README.md`를 현재 코드 상태에 맞게 업데이트한다.
+
+- **주요 기능 표**: 새 도구가 추가/삭제되면 반영한다.
+- **프로젝트 구조**: 새 파일이 생기거나 삭제되면 트리를 업데이트한다.
+- **환경변수 목록**: `.env.example` 변경 시 함께 업데이트한다.
+- **기술 스택**: 새 라이브러리가 추가되면 반영한다.
+- README는 항상 한국어로 작성하되, 코드 블록·명령어·기술 용어는 영어 원어를 유지한다.
 
 ### Push 시 커밋 메시지 형식
 
