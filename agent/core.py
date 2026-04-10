@@ -10,8 +10,13 @@ from tools import system_tools, file_tools, web_tools, notify, file_organizer
 
 TOOLS = [
     {
+        "name": "get_pc_overview",
+        "description": "PC 전체 개요를 조회한다. 사용자명, 홈·바탕화면·다운로드·문서·사진·음악·동영상 폴더 경로, 전체 드라이브 현황, 운영체제 정보를 반환한다.",
+        "input_schema": {"type": "object", "properties": {}, "required": []},
+    },
+    {
         "name": "get_system_status",
-        "description": "현재 PC의 CPU·메모리·디스크 사용 현황을 조회한다.",
+        "description": "현재 PC의 CPU·메모리·전체 드라이브 사용 현황을 조회한다.",
         "input_schema": {"type": "object", "properties": {}, "required": []},
     },
     {
@@ -119,6 +124,7 @@ TOOLS = [
 # ── 도구 실행 디스패처 ──────────────────────────────────────────────────────────
 
 TOOL_HANDLERS = {
+    "get_pc_overview":   lambda args: system_tools.get_pc_overview(),
     "get_system_status": lambda args: system_tools.get_system_status(),
     "list_top_processes": lambda args: system_tools.list_top_processes(args.get("n", 10)),
     "list_directory": lambda args: file_tools.list_directory(args["path"], args.get("pattern", "*")),
@@ -145,24 +151,41 @@ def _run_tool(name: str, args: dict) -> str:
 class PCAgent:
     """사용자의 PC를 관리·자동화하는 에이전트."""
 
-    SYSTEM_PROMPT = """당신은 사용자의 Windows PC를 관리하는 AI 에이전트입니다.
-
-역할:
-- 시스템 상태(CPU·메모리·디스크)를 모니터링하고 이상 징후를 보고한다.
-- 파일 정리·검색·이동 등 파일 관리 작업을 수행한다.
-- 웹 검색으로 필요한 정보를 찾아 보고한다.
-- 사용자가 요청한 반복 작업을 자동화한다.
-
-원칙:
-- 파일 삭제, 프로세스 종료 등 위험한 작업은 반드시 사용자에게 확인 후 실행한다.
-- 모든 응답은 한국어로 간결하고 명확하게 작성한다.
-- 도구 실행 결과는 사용자가 이해하기 쉽게 요약해서 전달한다.
-"""
-
     def __init__(self, session_id: str = "default"):
         settings.validate()
         self.client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
         self.memory = AgentMemory(session_id)
+        self._system_prompt = self._build_system_prompt()
+
+    @staticmethod
+    def _build_system_prompt() -> str:
+        """실행 시점의 실제 PC 경로를 포함한 시스템 프롬프트를 생성한다."""
+        return f"""당신은 {settings.USERNAME} 님의 PC 전체를 관리하는 AI 에이전트입니다.
+
+사용자 PC 정보:
+- 사용자명:    {settings.USERNAME}
+- 홈 디렉터리: {settings.HOME_DIR}
+- 바탕화면:    {settings.DESKTOP_DIR}
+- 다운로드:    {settings.DOWNLOADS_DIR}
+- 문서:        {settings.DOCUMENTS_DIR}
+- 사진:        {settings.PICTURES_DIR}
+- 음악:        {settings.MUSIC_DIR}
+- 동영상:      {settings.VIDEOS_DIR}
+
+역할:
+- PC 전체의 CPU·메모리·전체 드라이브 상태를 모니터링하고 이상 징후를 보고한다.
+- 바탕화면·다운로드·문서·사진 등 주요 폴더의 파일을 정리·분류·검색한다.
+- PII(주민번호·카드번호 등 개인정보) 포함 파일을 자동 감지해 격리한다.
+- 중복 파일을 찾아 정리를 제안한다.
+- 웹 검색으로 필요한 정보를 찾아 보고한다.
+- 사용자가 요청한 반복 작업을 자동화한다.
+
+원칙:
+- 파일 삭제·프로세스 종료 등 위험한 작업은 반드시 사용자에게 확인 후 실행한다.
+- 경로를 추측하지 않고, 위에 명시된 실제 PC 경로를 기준으로 작업한다.
+- 모든 응답은 한국어로 간결하고 명확하게 작성한다.
+- 도구 실행 결과는 사용자가 이해하기 쉽게 요약해서 전달한다.
+"""
 
     def chat(self, user_input: str) -> str:
         """사용자 입력을 받아 에이전트 응답을 반환한다."""
@@ -181,7 +204,7 @@ class PCAgent:
             response = self.client.messages.create(
                 model=settings.AGENT_MODEL,
                 max_tokens=settings.AGENT_MAX_TOKENS,
-                system=self.SYSTEM_PROMPT,
+                system=self._system_prompt,
                 tools=TOOLS,
                 messages=loop_messages,
             )

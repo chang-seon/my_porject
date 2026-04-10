@@ -43,16 +43,24 @@ def run_scheduler_mode():
         status = system_tools.get_system_status()
         cpu = status["cpu"]["사용률(%)"]
         mem = status["memory"]["사용률(%)"]
-        disk = status["disk"]["사용률(%)"]
-        log_alert("INFO", f"시스템 상태 - CPU: {cpu}% | 메모리: {mem}% | 디스크: {disk}%")
+        disks = status["디스크"]
+
+        disk_summary = " | ".join(
+            f"{d['드라이브']} {d['사용률(%)']}%" for d in disks
+        )
+        log_alert("INFO", f"시스템 상태 - CPU: {cpu}% | 메모리: {mem}% | 디스크: {disk_summary}")
 
         # 임계값 초과 시 알림
         if cpu > 85:
             send_notification("CPU 경고", f"CPU 사용률이 {cpu}% 입니다.")
         if mem > 90:
             send_notification("메모리 경고", f"메모리 사용률이 {mem}% 입니다.")
-        if disk > 90:
-            send_notification("디스크 경고", f"디스크 사용률이 {disk}% 입니다.")
+        for d in disks:
+            if d["사용률(%)"] > 90:
+                send_notification(
+                    "디스크 경고",
+                    f"{d['드라이브']} 사용률이 {d['사용률(%)']}% 입니다. (여유 {d['여유(GB)']}GB)"
+                )
 
     scheduler.add_job(monitor_task, SCHEDULER_INTERVAL, label="시스템 모니터링")
     scheduler.run_scheduler(blocking=True)

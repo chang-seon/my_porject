@@ -13,7 +13,7 @@ ANTHROPIC_API_KEY: str = os.getenv("ANTHROPIC_API_KEY", "")
 AGENT_MODEL: str = os.getenv("AGENT_MODEL", "claude-sonnet-4-6")
 AGENT_MAX_TOKENS: int = int(os.getenv("AGENT_MAX_TOKENS", "4096"))
 
-# 경로
+# 프로젝트 경로
 MEMORY_DIR: Path = BASE_DIR / "memory"
 LOG_DIR: Path = BASE_DIR / "logs"
 
@@ -25,6 +25,16 @@ SCHEDULER_INTERVAL: int = int(os.getenv("SCHEDULER_INTERVAL", "60"))
 
 # 알림
 ENABLE_NOTIFICATIONS: bool = os.getenv("ENABLE_NOTIFICATIONS", "true").lower() == "true"
+
+# ── 사용자 PC 경로 (자동 감지) ────────────────────────────────────────────────
+HOME_DIR:      Path = Path.home()
+DESKTOP_DIR:   Path = HOME_DIR / "Desktop"
+DOWNLOADS_DIR: Path = HOME_DIR / "Downloads"
+DOCUMENTS_DIR: Path = HOME_DIR / "Documents"
+PICTURES_DIR:  Path = HOME_DIR / "Pictures"
+MUSIC_DIR:     Path = HOME_DIR / "Music"
+VIDEOS_DIR:    Path = HOME_DIR / "Videos"
+USERNAME:      str  = os.getenv("USERNAME") or os.getenv("USER") or HOME_DIR.name
 
 
 def validate():
