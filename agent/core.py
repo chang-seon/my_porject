@@ -4,7 +4,7 @@ import json
 import anthropic
 from config import settings
 from agent.memory import AgentMemory
-from tools import system_tools, file_tools, web_tools, notify
+from tools import system_tools, file_tools, web_tools, notify, file_organizer
 
 # ── 에이전트가 사용할 도구 정의 (Anthropic tool_use 스키마) ─────────────────────
 
@@ -80,6 +80,40 @@ TOOLS = [
             "required": ["title", "message"],
         },
     },
+    {
+        "name": "smart_organize_folder",
+        "description": "지정 폴더의 파일을 내용·확장자 분석으로 자동 분류·정리한다. PII(주민번호·카드번호 등) 탐지 시 자동 격리하고 감사 로그를 기록한다.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "path": {"type": "string", "description": "정리할 폴더 경로"},
+            },
+            "required": ["path"],
+        },
+    },
+    {
+        "name": "find_duplicate_files",
+        "description": "지정 폴더에서 파일명이 달라도 내용이 완전히 동일한 중복 파일을 SHA-256 해시로 찾아 보고한다.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "path": {"type": "string", "description": "탐색할 폴더 경로"},
+            },
+            "required": ["path"],
+        },
+    },
+    {
+        "name": "approve_pending_file",
+        "description": "PII 탐지 또는 저신뢰 분류로 보류(pending)된 파일의 처리를 관리자 승인 후 최종 실행한다.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "target_dir":        {"type": "string", "description": "원본 폴더 경로"},
+                "pending_json_path": {"type": "string", "description": "pending JSON 파일 경로"},
+            },
+            "required": ["target_dir", "pending_json_path"],
+        },
+    },
 ]
 
 # ── 도구 실행 디스패처 ──────────────────────────────────────────────────────────
@@ -91,7 +125,10 @@ TOOL_HANDLERS = {
     "find_large_files": lambda args: file_tools.find_large_files(args["path"], args.get("min_size_mb", 100)),
     "organize_downloads": lambda args: file_tools.organize_downloads(args["downloads_path"]),
     "search_web": lambda args: web_tools.search_duckduckgo(args["query"], args.get("max_results", 5)),
-    "send_notification": lambda args: notify.send_notification(args["title"], args["message"]),
+    "send_notification":   lambda args: notify.send_notification(args["title"], args["message"]),
+    "smart_organize_folder": lambda args: file_organizer.organize_folder(args["path"]),
+    "find_duplicate_files":  lambda args: file_organizer.find_duplicate_files(args["path"]),
+    "approve_pending_file":  lambda args: file_organizer.approve_pending(args["target_dir"], args["pending_json_path"]),
 }
 
 

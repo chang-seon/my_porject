@@ -11,6 +11,7 @@
 |------|------|
 | 시스템 모니터링 | CPU·RAM·디스크 사용률 및 상위 프로세스 조회 |
 | 파일 관리 | 디렉터리 탐색, 대용량 파일 탐색, 다운로드 폴더 자동 정리 |
+| 고급 파일 정리 | 내용 분석 기반 자동 분류, PII 탐지·격리, 중복 파일 탐지, 감사 로그 |
 | 웹 검색 | DuckDuckGo 기반 검색 및 결과 요약 |
 | 데스크톱 알림 | Windows 토스트 알림 전송 |
 | 스케줄러 | 반복 작업 예약 실행 |
@@ -27,11 +28,12 @@ Agentic_AI/
 │   ├── core.py          # 메인 에이전트 루프 (LLM + 도구 호출)
 │   └── memory.py        # 대화·작업 기억 (JSON 영속 저장)
 ├── tools/
-│   ├── system_tools.py  # CPU·RAM·디스크 모니터링, 프로세스 관리
-│   ├── file_tools.py    # 파일 탐색·이동·삭제·정리
-│   ├── scheduler.py     # 작업 예약·반복 실행
-│   ├── web_tools.py     # 웹 검색 (DuckDuckGo)
-│   └── notify.py        # 데스크톱 알림
+│   ├── system_tools.py    # CPU·RAM·디스크 모니터링, 프로세스 관리
+│   ├── file_tools.py      # 파일 탐색·이동·삭제·정리 (기본)
+│   ├── file_organizer.py  # 고급 파일 정리 (내용 분류·PII 탐지·중복 탐지·감사 로그)
+│   ├── scheduler.py       # 작업 예약·반복 실행
+│   ├── web_tools.py       # 웹 검색 (DuckDuckGo)
+│   └── notify.py          # 데스크톱 알림
 ├── config/
 │   └── settings.py      # .env 기반 전역 설정 로더
 ├── memory/              # 대화·작업 이력 저장소 (git 제외)
@@ -81,6 +83,7 @@ python main.py --mode scheduler
 | 키 | 필수 | 기본값 | 설명 |
 |----|------|--------|------|
 | `ANTHROPIC_API_KEY` | ✅ | — | Anthropic API 인증 키 |
+
 | `AGENT_MODEL` | | `claude-sonnet-4-6` | 사용할 LLM 모델 |
 | `AGENT_MAX_TOKENS` | | `4096` | 응답 최대 토큰 수 |
 | `LOG_LEVEL` | | `INFO` | 로그 레벨 (DEBUG/INFO/WARNING/ERROR) |
@@ -105,7 +108,8 @@ python main.py --mode scheduler
 
 - **LLM**: Claude (Anthropic) — `claude-sonnet-4-6`
 - **언어**: Python 3.10+
-- **주요 라이브러리**: `anthropic`, `psutil`, `duckduckgo-search`, `winotify`
+- **주요 라이브러리**: `anthropic`, `psutil`, `requests`, `beautifulsoup4`, `rich`, `schedule`
+- **문서 처리**: `pymupdf` (PDF), `python-docx` (DOCX), `openpyxl` (XLSX)
 
 ---
 
