@@ -1,7 +1,7 @@
 # Agentic AI — PC 관리 에이전트
 
 사용자의 Windows PC에서 자율적으로 동작하는 AI 에이전트.  
-반복 작업 자동화, 시스템 모니터링, 파일 정리, 웹 검색을 대화형으로 수행한다.
+반복 작업 자동화, 시스템 모니터링, 파일 정리, 채용 지원, 이미지 분류, 오피스 문서 생성을 대화형으로 수행한다.
 
 ---
 
@@ -17,6 +17,9 @@
 | 데스크톱 알림 | Windows 토스트 알림 전송 |
 | 스케줄러 | 반복 작업 예약 실행 |
 | 대화 기억 | 대화·작업 이력 JSON 영속 저장 |
+| **채용 자동화** | 사람인·원티드 공고 크롤링, 회사 인재상 분석, 맞춤 자소서 작성·팩트체크·저장 |
+| **이미지 캐릭터 분류** | Claude Vision으로 애니·게임·영화 캐릭터 자동 인식 후 폴더별 정리 |
+| **오피스 자동화** | 명령 한 줄로 PPT·Excel·DOCX 파일 자동 생성 |
 
 ---
 
@@ -34,10 +37,15 @@ Agentic_AI/
 │   ├── file_organizer.py  # 고급 파일 정리 (내용 분류·PII 탐지·중복 탐지·감사 로그)
 │   ├── scheduler.py       # 작업 예약·반복 실행
 │   ├── web_tools.py       # 웹 검색 (DuckDuckGo)
-│   └── notify.py          # 데스크톱 알림
+│   ├── notify.py          # 데스크톱 알림
+│   ├── job_tools.py       # 채용 자동화 (크롤링·인재상 분석·자소서·팩트체크)
+│   ├── image_organizer.py # 이미지 캐릭터 인식 및 폴더 자동 분류
+│   └── office_tools.py    # 오피스 자동화 (PPT·Excel·DOCX 생성)
 ├── config/
 │   └── settings.py      # .env 기반 전역 설정 로더
-├── memory/              # 대화·작업 이력 저장소 (git 제외)
+├── memory/
+│   ├── resume_profile.json  # 이력서·자소서 프로필 (채용 자동화용)
+│   └── cover_letters/       # 생성된 자소서 저장 폴더
 ├── logs/                # 실행 로그 (git 제외)
 ├── .env.example         # 환경변수 템플릿
 └── requirements.txt
@@ -84,7 +92,6 @@ python main.py --mode scheduler
 | 키 | 필수 | 기본값 | 설명 |
 |----|------|--------|------|
 | `ANTHROPIC_API_KEY` | ✅ | — | Anthropic API 인증 키 |
-
 | `AGENT_MODEL` | | `claude-sonnet-4-6` | 사용할 LLM 모델 |
 | `AGENT_MAX_TOKENS` | | `4096` | 응답 최대 토큰 수 |
 | `LOG_LEVEL` | | `INFO` | 로그 레벨 (DEBUG/INFO/WARNING/ERROR) |
@@ -99,8 +106,14 @@ python main.py --mode scheduler
 사용자: 지금 CPU 얼마나 쓰고 있어?
 에이전트: 현재 CPU 사용률은 23%입니다. 코어 수는 12개이며, 메모리는 16GB 중 9.2GB 사용 중입니다.
 
-사용자: 다운로드 폴더 정리해줘
-에이전트: C:\Users\User\Downloads 폴더를 정리했습니다. 이미지 12개, 문서 5개, 압축파일 3개를 각 폴더로 이동했습니다.
+사용자: 사무직 채용공고 브리핑해줘
+에이전트: 사람인·원티드에서 최신 공고 20건을 수집했습니다. 회사별 인재상 분석과 함께 보여드릴게요.
+
+사용자: D:\사진 폴더 캐릭터별로 정리해줘
+에이전트: 먼저 미리보기를 실행합니다. 나루토 12장, 루피 7장, _미분류 3장으로 분류될 예정입니다.
+
+사용자: 월간 보고서 PPT 만들어줘
+에이전트: 슬라이드 구성을 알려주시면 바로 생성해 드리겠습니다.
 ```
 
 ---
@@ -110,7 +123,8 @@ python main.py --mode scheduler
 - **LLM**: Claude (Anthropic) — `claude-sonnet-4-6`
 - **언어**: Python 3.10+
 - **주요 라이브러리**: `anthropic`, `psutil`, `requests`, `beautifulsoup4`, `rich`, `schedule`
-- **문서 처리**: `pymupdf` (PDF), `python-docx` (DOCX), `openpyxl` (XLSX)
+- **문서 처리**: `pymupdf` (PDF), `python-docx` (DOCX), `openpyxl` (XLSX), `python-pptx` (PPTX)
+- **이미지 처리**: `Pillow` (리사이즈·인코딩)
 
 ---
 
@@ -118,10 +132,6 @@ python main.py --mode scheduler
 
 - `requirements.txt`는 삭제 없이 누적 기록한다 — PC 교체 시 동일 환경 복원 목적
 - 버전 업그레이드 시 구버전을 주석으로 보존해 즉시 롤백 가능하도록 유지한다
-
-```bash
-pip install -r requirements.txt
-```
 
 ---
 
