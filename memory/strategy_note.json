@@ -1,0 +1,12 @@
+{
+  "sessions": [],
+  "style_preferences": [],
+  "last_updated": "",
+  "_meta": {
+    "description": "창선님의 선호 스타일을 세션마다 자동 학습하여 저장하는 경험 DB",
+    "schema": {
+      "sessions": [{"timestamp": "ISO 8601", "mission": "미션 요약", "preference": "학습된 선호 스타일"}],
+      "style_preferences": ["최근 20개 선호 스타일 요약 문장 목록"]
+    }
+  }
+}

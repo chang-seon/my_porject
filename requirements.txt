@@ -1,0 +1,6 @@
+# Agentic AI v3 — 의존성 (Gemini 무료 티어 전용 경량 구성)
+# 설치: venv/Scripts/pip install -r requirements.txt
+
+google-genai>=1.0.0
+aiohttp>=3.9.0
+python-dotenv>=1.0.0
