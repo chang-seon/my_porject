@@ -1,0 +1,107 @@
+# cover_letter_rules.yaml
+# Q4 작성 주체: Claude 초안 (잠정) — DAY 07 확정
+# 1차 룰 = LLM 없음, 비용 0 (D 하이브리드 구조)
+
+version: "1.0"
+target: cover_letter
+
+# 문체 마커 6종 — 어창선 본인 문체 특징
+style_markers:
+  - id: SM-01
+    name: 구체적_수치
+    description: 성과·규모를 수치로 표현한다
+    patterns:
+      - "\\d+%"
+      - "\\d+배"
+      - "\\d+건"
+      - "\\d+명"
+    weight: 1.2
+
+  - id: SM-02
+    name: 능동_동사
+    description: 수동적 표현 대신 능동 동사로 시작한다
+    patterns:
+      - "^(구축|개발|설계|분석|개선|제안|주도|협업)"
+    weight: 1.1
+
+  - id: SM-03
+    name: 문제_해결_구조
+    description: 문제→원인→해결→결과 순서로 서술한다
+    keywords:
+      - "문제"
+      - "원인"
+      - "해결"
+      - "결과"
+    min_count: 2
+    weight: 1.0
+
+  - id: SM-04
+    name: 맥락_연결
+    description: 경험을 지원 직무와 명시적으로 연결한다
+    keywords:
+      - "통해"
+      - "경험을"
+      - "역량을"
+    weight: 0.9
+
+  - id: SM-05
+    name: 도전_성장_어휘
+    description: 신입 단계에 맞는 도전·성장 지향 어휘를 사용한다
+    keywords:
+      - "도전"
+      - "성장"
+      - "배움"
+      - "기여"
+    weight: 1.0
+
+  - id: SM-06
+    name: 마무리_포부
+    description: 단락 마지막을 포부·다짐으로 마무리한다
+    patterns:
+      - "(하겠습니다|이루겠습니다|기여하겠습니다)$"
+    weight: 0.8
+
+# 안티패턴 4종 — GPT 투명체 및 금지 표현
+anti_patterns:
+  - id: AP-01
+    name: GPT_투명체
+    description: AI가 작성한 것처럼 보이는 투명한 표현
+    patterns:
+      - "분석했습니다"
+      - "살펴보았습니다"
+      - "검토했습니다"
+      - "중요하다고 생각합니다"
+      - "노력하겠습니다"
+    severity: high
+
+  - id: AP-02
+    name: 도식적_마무리
+    description: 단락마다 회사명·직무명을 그대로 붙이는 마무리
+    patterns:
+      - ".*(에서|에서의).*(하고 싶습니다|되겠습니다)$"
+    severity: medium
+
+  - id: AP-03
+    name: 근거없는_주장
+    description: 구체적 근거 없이 역량을 주장하는 표현
+    patterns:
+      - "최고의"
+      - "탁월한"
+      - "뛰어난"
+      - "누구보다"
+    severity: medium
+
+  - id: AP-04
+    name: 수동_피동
+    description: 과도한 피동형 표현
+    patterns:
+      - "~되어졌습니다"
+      - "~되어 있습니다"
+      - "~지어졌습니다"
+    severity: low
+
+# 검증 기준
+thresholds:
+  min_style_markers_hit: 3       # 6개 중 3개 이상 감지 시 통과
+  max_anti_patterns_hit: 1       # 안티패턴 2개 이상 감지 시 실패
+  min_score: 0.6                 # 0.0~1.0 종합 점수

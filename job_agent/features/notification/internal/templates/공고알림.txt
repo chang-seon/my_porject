@@ -1,0 +1,10 @@
+📢 <b>새 공고 알림</b>
+
+🏢 <b>{company}</b>
+💼 {job_role}
+📍 {location}
+📅 마감: {deadline}
+
+🔗 <a href="{url}">공고 보기</a>
+
+적합도: {match_score}점

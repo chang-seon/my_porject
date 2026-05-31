@@ -1,0 +1,40 @@
+# job_posting_rules.yaml
+version: "1.0"
+target: job_posting
+
+style_markers:
+  - id: JM-01
+    name: 필수_필드_존재
+    description: title, company, url, source 모두 있음
+    required_fields:
+      - title
+      - company
+      - url
+      - source
+    weight: 1.5
+
+  - id: JM-02
+    name: 직무_명시
+    description: job_role 또는 title에 직무가 명시됨
+    weight: 1.0
+
+  - id: JM-03
+    name: 날짜_형식
+    description: deadline/posted_date가 ISO8601 형식
+    patterns:
+      - "\\d{4}-\\d{2}-\\d{2}"
+    weight: 0.8
+
+anti_patterns:
+  - id: JA-01
+    name: 중복_공고
+    description: 동일 URL이 이미 DB에 존재
+    severity: high
+
+  - id: JA-02
+    name: 만료_공고
+    description: deadline이 오늘 이전
+    severity: medium
+
+thresholds:
+  min_score: 0.8

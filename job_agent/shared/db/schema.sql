@@ -1,0 +1,32 @@
+-- schema.sql — 전체 DB 설계 참조 문서
+-- 실제 실행은 migrations/0001_initial.sql 사용
+--
+-- 설계 원칙:
+--   - 모든 개인 데이터 테이블: user_id 컬럼 필수 (#38)
+--   - 공유 지식(rag_knowledge): user_id 없음 (#38)
+--   - 날짜: TEXT ISO8601 + year/month/day 정수 계층 인덱스 (#37)
+--   - JSON 배열/객체: TEXT 컬럼에 JSON 직렬화하여 저장
+--   - DB 위치: D:\IT\Agentic_AI\data\agent.db (환경변수 DB_PATH로 오버라이드)
+
+-- [개인 데이터] ─ 페르소나 11섹션
+-- personas              : 섹션 1 신원 (1:1 per user)
+-- persona_educations    : 섹션 1 교육 이력 (1:N)
+-- persona_target_jobs   : 섹션 2 목표 직무 (1:N)
+-- persona_content_assets: 섹션 3 콘텐츠 자산 (1:N)
+-- persona_skills        : 섹션 4 스킬·자격 (1:N)
+-- persona_style_markers : 섹션 5 문체 카드 (1:N)
+-- persona_anti_patterns : 섹션 6 안티패턴 (1:N)
+-- persona_traits        : 섹션 7 성격 (1:N)
+-- persona_values        : 섹션 8 가치관 (1:N)
+-- persona_constraints   : 섹션 9 제약 (1:N)
+-- persona_career_history: 섹션 11 커리어 단계 이력 (1:N)
+-- persona_changelog     : 섹션 10 메타 / 변경 이력 전체 (#37)
+
+-- [개인 데이터] ─ 운영
+-- pass_records      : 패스·배제 기록
+-- learning_signals  : 학습 신호 5층 (A~E)
+-- event_logs        : 이벤트 로그
+-- dynamic_thresholds: 동적 기준값 (#37)
+
+-- [공유 지식]
+-- rag_knowledge     : RAG 지식베이스 (user_id 없음)

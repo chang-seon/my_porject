@@ -1,8 +1,12 @@
 ﻿.env
 .venv/
+venv/
 __pycache__/
 *.pyc
 *.pyo
+*.db
 output/
 wiki_state.json
 logs/
+.mypy_cache/
+job_agent/protected/

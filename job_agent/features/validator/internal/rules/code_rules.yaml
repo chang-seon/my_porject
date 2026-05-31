@@ -1,0 +1,53 @@
+# code_rules.yaml
+version: "1.0"
+target: code
+
+style_markers:
+  - id: CM-01
+    name: 함수_단일책임
+    description: 함수 하나가 하나의 역할만 수행
+    max_lines_per_function: 40
+    weight: 1.0
+
+  - id: CM-02
+    name: 반환타입_명시
+    description: 함수 반환 타입이 type hint로 명시됨
+    patterns:
+      - "def \\w+\\(.*\\) -> "
+    weight: 1.0
+
+  - id: CM-03
+    name: dict_반환
+    description: 도구 함수가 dict를 반환 (CLAUDE.md 규칙)
+    patterns:
+      - 'return \\{"결과"'
+    weight: 1.2
+
+anti_patterns:
+  - id: CA-01
+    name: 하드코딩_경로
+    description: 절대 경로가 코드에 박혀 있음
+    patterns:
+      - "[\"']C:\\\\|D:\\\\"
+    severity: high
+
+  - id: CA-02
+    name: 예외_무시
+    description: except 절에 pass만 있고 로깅도 없음
+    patterns:
+      - "except.*:\\s*pass"
+    severity: medium
+
+  - id: CA-03
+    name: 금지_함수
+    description: subprocess/eval/exec 사용 (CLAUDE.md 보안 규칙)
+    patterns:
+      - "subprocess\\."
+      - "os\\.system"
+      - "\\beval\\("
+      - "\\bexec\\("
+    severity: critical
+
+thresholds:
+  min_score: 0.7
+  max_anti_patterns_hit: 0      # critical 안티패턴은 1개라도 실패

@@ -1,0 +1,8 @@
+🔔 <b>사용자 결정 요청</b>
+
+{question}
+
+선택지:
+{options}
+
+→ CLI: python tools/hitl_cli.py --id {request_id}

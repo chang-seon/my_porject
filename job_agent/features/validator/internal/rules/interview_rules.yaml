@@ -1,0 +1,47 @@
+# interview_rules.yaml
+version: "1.0"
+target: interview
+
+style_markers:
+  - id: IM-01
+    name: STAR_구조
+    description: 상황(S)·과제(T)·행동(A)·결과(R) 구조로 답변
+    keywords:
+      - "상황"
+      - "문제"
+      - "행동"
+      - "결과"
+    min_count: 2
+    weight: 1.2
+
+  - id: IM-02
+    name: 구체적_수치
+    description: 결과를 수치로 뒷받침
+    patterns:
+      - "\\d+%|\\d+배|\\d+건"
+    weight: 1.1
+
+  - id: IM-03
+    name: 지원_동기_연결
+    description: 경험을 지원 직무와 명시적으로 연결
+    keywords:
+      - "역량"
+      - "기여"
+      - "적용"
+    weight: 1.0
+
+anti_patterns:
+  - id: IA-01
+    name: 단답형
+    description: 답변이 지나치게 짧음 (100자 미만)
+    max_length: 100
+    severity: medium
+
+  - id: IA-02
+    name: 거짓_경력
+    description: 페르소나 콘텐츠 풀에 없는 사실 언급 가능성
+    severity: high
+
+thresholds:
+  min_style_markers_hit: 2
+  min_score: 0.65

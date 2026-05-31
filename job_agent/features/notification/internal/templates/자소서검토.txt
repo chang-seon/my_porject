@@ -1,0 +1,11 @@
+📝 <b>자소서 검토 요청</b>
+
+🏢 {company} — {job_role}
+
+검증 결과: {validation_result}
+점수: {score}점
+
+<a href="{draft_url}">초안 보기</a>
+
+✅ 승인 | ✏️ 수정 | ❌ 폐기
+→ CLI: python tools/hitl_cli.py --id {request_id}

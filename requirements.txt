@@ -1,5 +1,25 @@
+# CLAUDE.md 규칙: 한 번 기록된 라이브러리는 삭제 금지.
+# PC 교체 시 동일 환경 복원을 위한 영구 기록부.
+
+# 기존 (하네스 엔지니어링 환경 세팅)
 pydantic>=2.0
 requests>=2.31.0
 httpx>=0.27.0
 python-dotenv>=1.0.0
 rich>=13.0.0
+
+# DAY 01 추가
+anthropic>=0.50.0
+# google-generativeai>=0.8.0  (구버전 deprecated — google-genai로 교체)
+google-genai>=2.7.0
+sqlmodel>=0.0.21
+python-telegram-bot>=21.0
+pytest>=8.0
+pyyaml>=6.0
+python-docx>=1.1.0
+pypdf>=4.0.0
+
+# DAY 29 추가 (대시보드)
+fastapi>=0.110.0
+uvicorn>=0.29.0
+httpx2>=0.28.0
